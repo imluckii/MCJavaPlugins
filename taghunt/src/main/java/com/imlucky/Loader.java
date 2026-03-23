@@ -25,9 +25,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
@@ -97,7 +97,7 @@ public class Loader extends JavaPlugin implements Listener {
                             if ((item.getType() == Material.RED_TERRACOTTA
                                     && display.equals("Infinite Red Terracotta"))
                                     || (item.getType() == Material.BLUE_TERRACOTTA
-                                    && display.equals("Infinite Blue Terracotta"))) {
+                                            && display.equals("Infinite Blue Terracotta"))) {
                                 item.setAmount(64);
                             }
                         }
@@ -111,9 +111,13 @@ public class Loader extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
-        abilityListener.clearBridgeEggs();
-        gameManager.savePoints(getConfig());
-        saveConfig();
+        if (abilityListener != null) {
+            abilityListener.clearBridgeEggs();
+        }
+        if (gameManager != null) {
+            gameManager.savePoints(getConfig());
+            saveConfig();
+        }
         LOGGER.info("TagHunt disabled");
     }
 
@@ -121,7 +125,8 @@ public class Loader extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onPlayerHit(EntityDamageByEntityEvent event) {
-        if (!(event.getDamager() instanceof Player) || !(event.getEntity() instanceof Player)) return;
+        if (!(event.getDamager() instanceof Player) || !(event.getEntity() instanceof Player))
+            return;
         Player damager = (Player) event.getDamager();
         Player target = (Player) event.getEntity();
 
@@ -184,7 +189,8 @@ public class Loader extends JavaPlugin implements Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         Player p = event.getPlayer();
-        if (!gameManager.isFrozen(p)) return;
+        if (!gameManager.isFrozen(p))
+            return;
         if (System.currentTimeMillis() - gameManager.getLastFreezeTime(p) > 3000) {
             p.spigot().sendMessage(ChatMessageType.ACTION_BAR,
                     new TextComponent(ChatColor.RED + "You are frozen!"));
@@ -198,8 +204,11 @@ public class Loader extends JavaPlugin implements Listener {
     }
 
     @EventHandler
-    public void onItemPickup(PlayerPickupItemEvent event) {
-        Player player = event.getPlayer();
+    public void onItemPickup(EntityPickupItemEvent event) {
+        if (!(event.getEntity() instanceof Player)) {
+            return;
+        }
+        Player player = (Player) event.getEntity();
         ItemStack item = event.getItem().getItemStack();
         if (item.getType() == Material.BOW && item.hasItemMeta()
                 && item.getItemMeta().getPersistentDataContainer()
@@ -216,12 +225,15 @@ public class Loader extends JavaPlugin implements Listener {
     @EventHandler
     public void onAbilitySelectorInteract(PlayerInteractEvent event) {
         if (event.getAction() != Action.RIGHT_CLICK_AIR
-                && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+                && event.getAction() != Action.RIGHT_CLICK_BLOCK)
+            return;
         Player player = event.getPlayer();
         ItemStack item = player.getInventory().getItemInMainHand();
-        if (item == null || !item.hasItemMeta()) return;
+        if (item == null || !item.hasItemMeta())
+            return;
         if (!item.getItemMeta().getPersistentDataContainer()
-                .has(abilitySelectorKey, PersistentDataType.BYTE)) return;
+                .has(abilitySelectorKey, PersistentDataType.BYTE))
+            return;
         if (!gameManager.isRunner(player)) {
             player.sendMessage(ChatColor.RED + "Only runners can choose abilities.");
             return;
@@ -249,7 +261,8 @@ public class Loader extends JavaPlugin implements Listener {
     class SetHunterCommand implements CommandExecutor {
         @Override
         public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-            if (args.length != 1) return false;
+            if (args.length != 1)
+                return false;
             Player target = getServer().getPlayer(args[0]);
             if (target == null) {
                 sender.sendMessage(ChatColor.RED + "Player not found.");
@@ -268,7 +281,8 @@ public class Loader extends JavaPlugin implements Listener {
     class SetRunnerCommand implements CommandExecutor {
         @Override
         public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-            if (args.length != 1) return false;
+            if (args.length != 1)
+                return false;
             Player target = getServer().getPlayer(args[0]);
             if (target == null) {
                 sender.sendMessage(ChatColor.RED + "Player not found.");
@@ -370,7 +384,7 @@ public class Loader extends JavaPlugin implements Listener {
                     if (timeLeft == 30 || timeLeft == 15 || timeLeft <= 10) {
                         for (Player p : Bukkit.getOnlinePlayers()) {
                             p.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                                    new TextComponent(ChatColor.YELLOW + timeLeft + " seconds left!"));
+                                    new TextComponent(ChatColor.YELLOW.toString() + timeLeft + " seconds left!"));
                         }
                     }
                     timeLeft--;

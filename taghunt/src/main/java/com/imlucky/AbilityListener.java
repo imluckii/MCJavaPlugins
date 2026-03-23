@@ -31,6 +31,7 @@ public class AbilityListener implements Listener {
     private static final long GRAPPLE_COOLDOWN_MS = 8000L;
     private static final double DASH_SPEED = 1.2;
     private static final double JUMP_POWER = 0.8;
+    private static final double GROUND_CHECK_OFFSET = 0.1;
 
     private final JavaPlugin plugin;
     private final GameManager gameManager;
@@ -50,13 +51,16 @@ public class AbilityListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (!AbilityManager.GUI_TITLE.equals(event.getView().getTitle())) return;
+        if (!AbilityManager.GUI_TITLE.equals(event.getView().getTitle()))
+            return;
         event.setCancelled(true);
-        if (!(event.getWhoClicked() instanceof Player)) return;
+        if (!(event.getWhoClicked() instanceof Player))
+            return;
 
         Player player = (Player) event.getWhoClicked();
         ItemStack clicked = event.getCurrentItem();
-        if (clicked == null || clicked.getType() == Material.GRAY_STAINED_GLASS_PANE) return;
+        if (clicked == null || clicked.getType() == Material.GRAY_STAINED_GLASS_PANE)
+            return;
 
         AbilityType selected = null;
         for (AbilityType type : AbilityType.values()) {
@@ -69,7 +73,8 @@ public class AbilityListener implements Listener {
                 break;
             }
         }
-        if (selected == null) return;
+        if (selected == null)
+            return;
 
         abilityManager.setAbility(player, selected);
         abilityManager.giveAbilityItem(player, selected);
@@ -81,13 +86,16 @@ public class AbilityListener implements Listener {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.getAction() != Action.RIGHT_CLICK_AIR
-                && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+                && event.getAction() != Action.RIGHT_CLICK_BLOCK)
+            return;
 
         Player player = event.getPlayer();
-        if (!gameManager.isRunner(player) || gameManager.isFrozen(player)) return;
+        if (!gameManager.isRunner(player) || gameManager.isFrozen(player))
+            return;
 
         ItemStack item = player.getInventory().getItemInMainHand();
-        if (!abilityManager.isAbilityItem(item)) return;
+        if (!abilityManager.isAbilityItem(item))
+            return;
 
         AbilityType abilityType = abilityManager.getAbilityFromItem(item);
         if (abilityType == AbilityType.DASH_DOUBLE_JUMP) {
@@ -95,7 +103,8 @@ public class AbilityListener implements Listener {
             handleDash(player);
         }
         // GRAPPLING_HOOK is handled via PlayerFishEvent.
-        // BRIDGE_EGG is handled via ProjectileLaunchEvent (egg auto-thrown by the server).
+        // BRIDGE_EGG is handled via ProjectileLaunchEvent (egg auto-thrown by the
+        // server).
     }
 
     private void handleDash(Player player) {
@@ -111,7 +120,7 @@ public class AbilityListener implements Listener {
         dashCooldowns.put(uid, now);
 
         Vector dir = player.getLocation().getDirection();
-        if (player.isOnGround()) {
+        if (isStandingOnSolidBlock(player)) {
             // Dash forward
             dir.setY(0.2).normalize().multiply(DASH_SPEED);
             player.setVelocity(dir);
@@ -128,12 +137,19 @@ public class AbilityListener implements Listener {
         player.playSound(player.getLocation(), Sound.ENTITY_BREEZE_SHOOT, 0.8f, 1.3f);
     }
 
+    private boolean isStandingOnSolidBlock(Player player) {
+        return player.getLocation().clone().subtract(0, GROUND_CHECK_OFFSET, 0)
+                .getBlock().getType().isSolid();
+    }
+
     @EventHandler
     public void onPlayerFish(PlayerFishEvent event) {
-        if (event.getState() != PlayerFishEvent.State.CAUGHT_ENTITY) return;
+        if (event.getState() != PlayerFishEvent.State.CAUGHT_ENTITY)
+            return;
 
         Player player = event.getPlayer();
-        if (!gameManager.isRunner(player) || gameManager.isFrozen(player)) return;
+        if (!gameManager.isRunner(player) || gameManager.isFrozen(player))
+            return;
 
         // Check either hand for the grappling-hook ability item
         ItemStack mainHand = player.getInventory().getItemInMainHand();
@@ -141,13 +157,16 @@ public class AbilityListener implements Listener {
         boolean hasGrapple = (abilityManager.isAbilityItem(mainHand)
                 && abilityManager.getAbilityFromItem(mainHand) == AbilityType.GRAPPLING_HOOK)
                 || (abilityManager.isAbilityItem(offHand)
-                && abilityManager.getAbilityFromItem(offHand) == AbilityType.GRAPPLING_HOOK);
-        if (!hasGrapple) return;
+                        && abilityManager.getAbilityFromItem(offHand) == AbilityType.GRAPPLING_HOOK);
+        if (!hasGrapple)
+            return;
 
         Entity caught = event.getCaught();
-        if (!(caught instanceof Player)) return;
+        if (!(caught instanceof Player))
+            return;
         Player target = (Player) caught;
-        if (!gameManager.isRunner(target)) return; // can only grapple teammates
+        if (!gameManager.isRunner(target))
+            return; // can only grapple teammates
 
         UUID uid = player.getUniqueId();
         long now = System.currentTimeMillis();
@@ -177,12 +196,16 @@ public class AbilityListener implements Listener {
 
     @EventHandler
     public void onProjectileLaunch(ProjectileLaunchEvent event) {
-        if (!(event.getEntity() instanceof Egg)) return;
-        if (!(event.getEntity().getShooter() instanceof Player)) return;
+        if (!(event.getEntity() instanceof Egg))
+            return;
+        if (!(event.getEntity().getShooter() instanceof Player))
+            return;
 
         Player player = (Player) event.getEntity().getShooter();
-        if (!gameManager.isRunner(player) || gameManager.isFrozen(player)) return;
-        if (abilityManager.getAbility(player) != AbilityType.BRIDGE_EGG) return;
+        if (!gameManager.isRunner(player) || gameManager.isFrozen(player))
+            return;
+        if (abilityManager.getAbility(player) != AbilityType.BRIDGE_EGG)
+            return;
 
         UUID eggId = event.getEntity().getUniqueId();
         Egg egg = (Egg) event.getEntity();

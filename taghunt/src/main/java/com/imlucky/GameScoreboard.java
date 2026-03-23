@@ -3,6 +3,7 @@ package com.imlucky;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
@@ -16,7 +17,7 @@ public class GameScoreboard {
     public GameScoreboard(GameManager gameManager) {
         this.gameManager = gameManager;
         scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
-        objective = scoreboard.registerNewObjective("points", "dummy", ChatColor.BOLD + "POINTS");
+        objective = scoreboard.registerNewObjective("points", Criteria.DUMMY, ChatColor.BOLD + "POINTS");
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
     }
 

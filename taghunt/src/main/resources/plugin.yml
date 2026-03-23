@@ -1,6 +1,7 @@
 name: TagHunt
 main: com.imlucky.Loader
 version: 1.0
+api-version: '1.21'
 commands:
   sethunter:
     description: Set a player as hunter.
