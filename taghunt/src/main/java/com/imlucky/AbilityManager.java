@@ -42,14 +42,19 @@ public class AbilityManager {
 
     /** Returns true if the given ItemStack is a TagHunt ability-use item. */
     public boolean isAbilityItem(ItemStack item) {
-        if (item == null || !item.hasItemMeta()) return false;
+        if (item == null || !item.hasItemMeta())
+            return false;
         return item.getItemMeta().getPersistentDataContainer()
                 .has(abilityKey, PersistentDataType.STRING);
     }
 
-    /** Returns the AbilityType stored in the item's data, or null if not an ability item. */
+    /**
+     * Returns the AbilityType stored in the item's data, or null if not an ability
+     * item.
+     */
     public AbilityType getAbilityFromItem(ItemStack item) {
-        if (!isAbilityItem(item)) return null;
+        if (!isAbilityItem(item))
+            return null;
         String value = item.getItemMeta().getPersistentDataContainer()
                 .get(abilityKey, PersistentDataType.STRING);
         try {
@@ -96,7 +101,21 @@ public class AbilityManager {
      */
     public void giveAbilityItem(Player player, AbilityType type) {
         removeAbilityItems(player);
-        player.getInventory().addItem(buildAbilityUseItem(type));
+        if (type == AbilityType.DASH_DOUBLE_JUMP) {
+            player.getInventory().addItem(
+                    buildTaggedAbilityItem(type, Material.FEATHER, 1,
+                            ChatColor.GOLD + "Dash Feather",
+                            Arrays.asList(
+                                    ChatColor.AQUA + "Right-click to dash forward.",
+                                    ChatColor.GRAY + "Works the same on the ground or in the air.")),
+                    buildTaggedAbilityItem(type, Material.SLIME_BALL, 1,
+                            ChatColor.GOLD + "Hop Slime",
+                            Arrays.asList(
+                                    ChatColor.AQUA + "Right-click to perform a hop.",
+                                    ChatColor.GRAY + "Useful for quick bursts of height.")));
+        } else {
+            player.getInventory().addItem(buildAbilityUseItem(type));
+        }
         player.sendMessage(ChatColor.GREEN + "Ability selected: " + ChatColor.GOLD + "" + ChatColor.BOLD
                 + type.getDisplayName());
     }
@@ -104,10 +123,15 @@ public class AbilityManager {
     /** Builds the in-hand ability-use item (with PDC marker). */
     public ItemStack buildAbilityUseItem(AbilityType type) {
         int amount = (type == AbilityType.BRIDGE_EGG) ? 16 : 1;
-        ItemStack item = new ItemStack(type.getIcon(), amount);
+        return buildTaggedAbilityItem(type, type.getIcon(), amount,
+                ChatColor.GOLD + type.getDisplayName(), new ArrayList<>(Arrays.asList(type.getDescription())));
+    }
+
+    private ItemStack buildTaggedAbilityItem(AbilityType type, Material material, int amount,
+            String displayName, List<String> lore) {
+        ItemStack item = new ItemStack(material, amount);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(ChatColor.GOLD + type.getDisplayName());
-        List<String> lore = new ArrayList<>(Arrays.asList(type.getDescription()));
+        meta.setDisplayName(displayName);
         meta.setLore(lore);
         meta.getPersistentDataContainer().set(abilityKey, PersistentDataType.STRING, type.name());
         item.setItemMeta(meta);

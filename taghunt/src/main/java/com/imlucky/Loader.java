@@ -72,6 +72,8 @@ public class Loader extends JavaPlugin implements Listener {
         getCommand("runkit").setExecutor(new RunkitCommand());
         getCommand("itemdrop").setExecutor(new ItemDropCommand());
         getCommand("ability").setExecutor(new AbilityCommand());
+        getCommand("clearbridgeeggs").setExecutor(new ClearBridgeEggsCommand());
+        getCommand("clearcooldown").setExecutor(new ClearCooldownCommand());
 
         // Particle effect for frozen runners
         new org.bukkit.scheduler.BukkitRunnable() {
@@ -112,7 +114,7 @@ public class Loader extends JavaPlugin implements Listener {
     @Override
     public void onDisable() {
         if (abilityListener != null) {
-            abilityListener.clearBridgeEggs();
+            abilityListener.shutdown();
         }
         if (gameManager != null) {
             gameManager.savePoints(getConfig());
@@ -518,6 +520,24 @@ public class Loader extends JavaPlugin implements Listener {
                 return true;
             }
             player.openInventory(abilityManager.createAbilityGUI());
+            return true;
+        }
+    }
+
+    class ClearBridgeEggsCommand implements CommandExecutor {
+        @Override
+        public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+            int cleared = abilityListener.clearPlacedBridgeBlocks();
+            sender.sendMessage(ChatColor.GREEN + "Cleared " + cleared + " bridge egg blocks.");
+            return true;
+        }
+    }
+
+    class ClearCooldownCommand implements CommandExecutor {
+        @Override
+        public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+            abilityListener.clearCooldowns();
+            sender.sendMessage(ChatColor.GREEN + "All ability cooldowns have been cleared.");
             return true;
         }
     }

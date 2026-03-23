@@ -6,23 +6,20 @@ import org.bukkit.Material;
 public enum AbilityType {
 
     DASH_DOUBLE_JUMP(
-            "Dash & Double Jump",
+            "Dash & Hop",
             Material.FEATHER,
-            ChatColor.AQUA + "Right-click on the ground to dash forward.",
-            ChatColor.AQUA + "Right-click in the air for a double jump!"
-    ),
+            ChatColor.AQUA + "Use the feather to dash forward.",
+            ChatColor.AQUA + "Use the slime ball to hop upward."),
     GRAPPLING_HOOK(
             "Grappling Hook",
             Material.FISHING_ROD,
-            ChatColor.YELLOW + "Cast your hook at a teammate",
-            ChatColor.YELLOW + "to grapple to their location!"
-    ),
+            ChatColor.YELLOW + "Hook a player to drag them to you,",
+            ChatColor.YELLOW + "or hook a block to pull yourself in!"),
     BRIDGE_EGG(
             "Bridge Egg",
             Material.EGG,
-            ChatColor.GREEN + "Throw the egg and it will",
-            ChatColor.GREEN + "build a bridge in its trail!"
-    );
+            ChatColor.GREEN + "Throw the egg to leave behind",
+            ChatColor.GREEN + "a jagged bridge trail!");
 
     private final String displayName;
     private final Material icon;

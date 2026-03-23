@@ -33,3 +33,9 @@ commands:
   ability:
     description: Open the runner ability selection menu.
     usage: /ability
+  clearbridgeeggs:
+    description: Clear all blocks created by bridge eggs.
+    usage: /clearbridgeeggs
+  clearcooldown:
+    description: Clear all runner ability cooldowns.
+    usage: /clearcooldown
