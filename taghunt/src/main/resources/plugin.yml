@@ -1,0 +1,34 @@
+name: TagHunt
+main: com.imlucky.Loader
+version: 1.0
+commands:
+  sethunter:
+    description: Set a player as hunter.
+    usage: /sethunter <player>
+  setrunner:
+    description: Set a player as runner.
+    usage: /setrunner <player>
+  startgame:
+    description: Start the game.
+    usage: /startgame
+  resetall:
+    description: Reset all role assignments and abilities.
+    usage: /resetall
+  resetpoints:
+    description: Reset player points.
+    usage: /resetpoints <all|player1 [player2 ...]>
+  challenge:
+    description: Start a 30-second challenge round.
+    usage: /challenge
+  runkit:
+    description: Give the runner kit (includes ability selector).
+    usage: /runkit
+  huntkit:
+    description: Give the hunter kit.
+    usage: /huntkit
+  itemdrop:
+    description: Drop a special bow at the configured location or target block.
+    usage: /itemdrop [or /itemdrop <look at block>]
+  ability:
+    description: Open the runner ability selection menu.
+    usage: /ability
